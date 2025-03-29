@@ -56,6 +56,9 @@
     .lesson-audio {
       margin-top: 0.5rem;
     }
+    button {
+      font-family: "Vazir", sans-serif;
+    }
     @media (max-width: 600px) {
       .header {
         font-size: 1.2rem;
@@ -67,8 +70,7 @@
 <body>
   <div class="header">اپلیکیشن رسا - آموزش سیاسی</div>
   <div class="lesson-container" id="lesson-container">در حال بارگذاری درس‌ها...</div>
-
-  <script>
+    <script>
     async function fetchLessons() {
       const sheetURL = 'https://opensheet.elk.sh/1-0VtS5cySxSIgVWcF4owEx4CWbGabpRL6L5OlBD1nfU/tabellenblatt1';
       const response = await fetch(sheetURL);
@@ -116,7 +118,7 @@
       });
 
       const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get("lesson")) {
+            if (urlParams.get("lesson")) {
         const title = urlParams.get("title");
         const rawText = decodeURIComponent(urlParams.get("text") || "");
         const audio = urlParams.get("audio");
@@ -143,9 +145,15 @@
         });
         if (inList) htmlText += "</ul>";
 
+        const backButton = document.createElement("button");
+        backButton.textContent = "بازگشت به لیست درس‌ها";
+        backButton.style = "margin-bottom: 1rem; padding: 0.5rem 1rem; font-size: 1rem; cursor: pointer;";
+        backButton.onclick = () => { window.location.href = window.location.pathname; };
+
         const content = document.createElement("div");
         content.className = "lesson-content";
-        content.innerHTML = `
+        content.appendChild(backButton);
+        content.innerHTML += `
           <div class="lesson-title">${title}</div>
           <div class="lesson-text">${htmlText}</div>
           ${audio ? `<audio class="lesson-audio" controls src="${audio}"></audio>` : ''}
