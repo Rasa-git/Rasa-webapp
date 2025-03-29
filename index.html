@@ -78,7 +78,7 @@
       const tsvText = await response.text();
 
       const rows = tsvText.trim().split("\n").map(r => r.split("\t"));
-      const headers = rows.shift();
+      const headers = rows.shift().map(h => h.trim().toLowerCase());
       const lessons = rows.map(row => {
         let item = {};
         headers.forEach((h, i) => item[h] = row[i]);
@@ -90,8 +90,8 @@
 
       let currentPhase = "";
       lessons.forEach(lesson => {
-        if (lesson.Phase && lesson.Phase !== currentPhase) {
-          currentPhase = lesson.Phase;
+        if (lesson.phase && lesson.phase !== currentPhase) {
+          currentPhase = lesson.phase;
           const phaseEl = document.createElement("div");
           phaseEl.className = "phase-title";
           phaseEl.textContent = currentPhase;
@@ -101,9 +101,9 @@
         const lessonEl = document.createElement("div");
         lessonEl.className = "lesson";
         lessonEl.innerHTML = `
-          <div class="lesson-title">${lesson.Title}</div>
-          <div class="lesson-text">${lesson.Text}</div>
-          ${lesson.Audio ? `<audio class="lesson-audio" controls src="${lesson.Audio}"></audio>` : ''}
+          <div class="lesson-title">${lesson.title}</div>
+          <div class="lesson-text">${lesson.text}</div>
+          ${lesson.audio ? `<audio class="lesson-audio" controls src="${lesson.audio}"></audio>` : ''}
         `;
         container.appendChild(lessonEl);
       });
