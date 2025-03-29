@@ -22,49 +22,44 @@
       font-size: 1.4rem;
     }
 
-    .phases-nav {
-      display: flex;
-      flex-wrap: wrap;
-      padding: 0.5rem;
-      gap: 0.5rem;
-      background: #eee;
-      justify-content: center;
+    .phase {
+      margin: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      background-color: #f0f0f0;
     }
 
-    .phase-button {
+    .phase-title {
       background-color: #ccc;
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 5px;
+      padding: 0.8rem 1rem;
+      font-weight: bold;
       cursor: pointer;
     }
 
-    .phase-button.active {
-      background-color: #666;
-      color: white;
-      font-weight: bold;
-    }
-
-    .lesson-container {
-      padding: 1rem;
-    }
-
-    .lesson {
-      background-color: white;
-      margin: 1rem 0;
-      padding: 1rem;
-      border-radius: 6px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    .lesson-list {
+      display: none;
+      padding: 0 1rem 1rem;
     }
 
     .lesson-title {
-      font-weight: bold;
-      margin-bottom: 0.5rem;
+      padding: 0.5rem 0;
+      cursor: pointer;
+      color: #0066cc;
+      text-decoration: underline;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .lesson-title:hover {
+      text-decoration: none;
+    }
+
+    .lesson-content {
+      padding: 1rem;
     }
 
     .lesson-text {
-      margin-bottom: 0.5rem;
-      line-height: 1.7;
+      margin-bottom: 1rem;
+      line-height: 1.8;
     }
 
     .lesson-audio {
@@ -75,63 +70,77 @@
       .header {
         font-size: 1.2rem;
       }
-      .lesson {
-        padding: 0.8rem;
-      }
     }
   </style>
-  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css" rel="stylesheet" type="text/css" />
+  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css" rel="stylesheet" />
 </head>
 <body>
   <div class="header">اپلیکیشن رسا - آموزش سیاسی</div>
-  <div class="phases-nav" id="phases-nav">در حال بارگذاری...</div>
-  <div class="lesson-container" id="lesson-container"></div>
+  <div class="lesson-container" id="lesson-container">در حال بارگذاری درس‌ها...</div>
 
   <script>
-    let allLessons = [];
-
     async function fetchLessons() {
-      const sheetURL = 'https://opensheet.elk.sh/1-0VtS5cySxSIgVWcF4owEx4CWbGabpRL6L5OlBD1nfU/Tabellenblatt1';
+      const sheetURL = 'https://opensheet.elk.sh/1-0VtS5cySxSIgVWcF4owEx4CWbGabpRL6L5OlBD1nfU/tabellenblatt1';
       const response = await fetch(sheetURL);
       const lessons = await response.json();
-      allLessons = lessons;
-      renderPhases(lessons);
-      const firstPhase = [...new Set(lessons.map(l => l.phase))][0];
-      renderLessons(firstPhase);
-    }
 
-    function renderPhases(lessons) {
-      const phases = [...new Set(lessons.map(l => l.phase))];
-      const nav = document.getElementById("phases-nav");
-      nav.innerHTML = "";
-      phases.forEach(phase => {
-        const btn = document.createElement("button");
-        btn.className = "phase-button";
-        btn.textContent = phase;
-        btn.onclick = () => {
-          document.querySelectorAll(".phase-button").forEach(b => b.classList.remove("active"));
-          btn.classList.add("active");
-          renderLessons(phase);
-        };
-        nav.appendChild(btn);
-      });
-      nav.querySelector(".phase-button")?.classList.add("active");
-    }
-
-    function renderLessons(phase) {
       const container = document.getElementById("lesson-container");
       container.innerHTML = "";
-      const filtered = allLessons.filter(l => l.phase === phase);
-      filtered.forEach(lesson => {
-        const el = document.createElement("div");
-        el.className = "lesson";
-        el.innerHTML = `
-          <div class="lesson-title">${lesson.title}</div>
-          <div class="lesson-text">${lesson.text}</div>
-          ${lesson.audio ? `<audio class="lesson-audio" controls src="${lesson.audio}"></audio>` : ''}
-        `;
-        container.appendChild(el);
+
+      const phases = {};
+
+      lessons.forEach(lesson => {
+        const phase = lesson.phase || "نامشخص";
+        if (!phases[phase]) phases[phase] = [];
+        phases[phase].push(lesson);
       });
+
+      Object.keys(phases).forEach(phase => {
+        const phaseBox = document.createElement("div");
+        phaseBox.className = "phase";
+
+        const phaseTitle = document.createElement("div");
+        phaseTitle.className = "phase-title";
+        phaseTitle.textContent = phase;
+        phaseTitle.onclick = () => {
+          lessonList.style.display = lessonList.style.display === "block" ? "none" : "block";
+        };
+
+        const lessonList = document.createElement("div");
+        lessonList.className = "lesson-list";
+
+        phases[phase].forEach(lesson => {
+          const titleEl = document.createElement("div");
+          titleEl.className = "lesson-title";
+          titleEl.textContent = lesson.title;
+          titleEl.onclick = () => {
+            const query = new URLSearchParams(lesson).toString();
+            window.location.href = "?lesson=1&" + query;
+          };
+          lessonList.appendChild(titleEl);
+        });
+
+        phaseBox.appendChild(phaseTitle);
+        phaseBox.appendChild(lessonList);
+        container.appendChild(phaseBox);
+      });
+
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get("lesson")) {
+        const title = urlParams.get("title");
+        const text = urlParams.get("text");
+        const audio = urlParams.get("audio");
+
+        const content = document.createElement("div");
+        content.className = "lesson-content";
+        content.innerHTML = `
+          <div class="lesson-title">${title}</div>
+          <div class="lesson-text">${text}</div>
+          ${audio ? `<audio class="lesson-audio" controls src="${audio}"></audio>` : ''}
+        `;
+        container.innerHTML = "";
+        container.appendChild(content);
+      }
     }
 
     fetchLessons();
