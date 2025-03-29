@@ -94,8 +94,8 @@
       const phases = {};
       lessons.forEach(lesson => {
         const phaseName = lesson["phase"];
-        if (!phases[phaseName]) phases[phaseName] = [];
-        phases[phaseName].push(lesson);
+        if (!phases[lesson["phase"]]) phases[lesson["phase"]] = [];
+phases[lesson["phase"]].push(lesson);
       });
 
       for (const [phase, items] of Object.entries(phases)) {
