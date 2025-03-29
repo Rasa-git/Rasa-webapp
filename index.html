@@ -1,0 +1,117 @@
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>اپ رسا</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      direction: rtl;
+    }
+    .header {
+      background: #333;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+    }
+    .lesson-list, .lesson-content {
+      max-width: 800px;
+      margin: auto;
+      padding: 1rem;
+    }
+    .lesson-item {
+      background: white;
+      margin-bottom: 0.5rem;
+      padding: 1rem;
+      cursor: pointer;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    .lesson-item:hover {
+      background: #eee;
+    }
+    .back-btn {
+      margin-bottom: 1rem;
+      display: inline-block;
+      color: #007BFF;
+      cursor: pointer;
+    }
+    audio {
+      width: 100%;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>اپ رسا</h1>
+  </div>
+
+  <div class="lesson-list" id="lessonList">
+    در حال بارگذاری درس‌ها...
+  </div>
+
+  <div class="lesson-content" id="lessonContent" style="display:none;">
+    <div class="back-btn" onclick="goBack()">← بازگشت به لیست درس‌ها</div>
+    <h2 id="lessonTitle"></h2>
+    <p id="lessonText"></p>
+    <audio id="lessonAudio" controls style="display:none;"></audio>
+  </div>
+
+  <script>
+    const sheetUrl = "https://docs.google.com/spreadsheets/d/1-0VtS5cySxSIgVWcF4owEx4CWbGabpRL6L5OlBD1nfU/gviz/tq?tqx=out:json";
+
+    fetch(sheetUrl)
+      .then(res => res.text())
+      .then(data => {
+        const jsonData = JSON.parse(data.substr(47).slice(0, -2));
+        const rows = jsonData.table.rows;
+        const lessons = rows.map(row => {
+          const cells = row.c;
+          return {
+            number: cells[0]?.v || '',
+            title: cells[1]?.v || '',
+            text: cells[2]?.v || '',
+            audio: cells[3]?.v || ''
+          };
+        });
+
+        const lessonList = document.getElementById("lessonList");
+        lessonList.innerHTML = "";
+        lessons.forEach((lesson) => {
+          const item = document.createElement("div");
+          item.className = "lesson-item";
+          item.innerText = lesson.title;
+          item.onclick = () => showLesson(lesson);
+          lessonList.appendChild(item);
+        });
+      });
+
+    function showLesson(lesson) {
+      document.getElementById("lessonList").style.display = "none";
+      document.getElementById("lessonContent").style.display = "block";
+      document.getElementById("lessonTitle").innerText = lesson.title;
+      document.getElementById("lessonText").innerText = lesson.text;
+      const audio = document.getElementById("lessonAudio");
+      if (lesson.audio && lesson.audio.startsWith("http")) {
+        audio.src = lesson.audio;
+        audio.style.display = "block";
+      } else {
+        audio.style.display = "none";
+      }
+    }
+
+    function goBack() {
+      document.getElementById("lessonContent").style.display = "none";
+      document.getElementById("lessonList").style.display = "block";
+    }
+  </script>
+
+</body>
+</html>
