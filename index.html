@@ -81,7 +81,7 @@
       const tsvText = await response.text();
 
       const rows = tsvText.trim().split("\n").map(r => r.split("\t"));
-      const headers = rows.shift().map(h => h.toLowerCase());
+      const headers = rows.shift().map(h => h.trim().toLowerCase());
       const lessons = rows.map(row => {
         const item = {};
         headers.forEach((h, i) => item[h] = row[i]);
@@ -93,21 +93,23 @@
 
       const phases = {};
       lessons.forEach(lesson => {
-        const phaseName = lesson["phase"];
-        if (!phases[lesson["phase"]]) phases[lesson["phase"]] = [];
-phases[lesson["phase"]].push(lesson);
+        const phase = lesson["phase"]?.trim();
+        if (!phase) return;
+        if (!phases[phase]) phases[phase] = [];
+        phases[phase].push(lesson);
       });
 
       for (const [phase, items] of Object.entries(phases)) {
         const phaseBox = document.createElement("div");
         phaseBox.className = "phase";
 
-        const list = document.createElement("div");
-        list.className = "lesson-list";
-
         const phaseTitle = document.createElement("div");
         phaseTitle.className = "phase-title";
         phaseTitle.textContent = phase;
+
+        const list = document.createElement("div");
+        list.className = "lesson-list";
+
         phaseTitle.onclick = () => {
           list.style.display = list.style.display === "none" ? "block" : "none";
         };
