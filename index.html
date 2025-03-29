@@ -73,7 +73,8 @@
 <body>
   <div class="header">اپلیکیشن رسا - آموزش سیاسی</div>
   <div id="lesson-container">در حال بارگذاری درس‌ها...</div>
-    <script>
+
+  <script>
     async function fetchLessons() {
       const sheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQqK7c_o8N2rwYwZpXG6GSPgWZDLTuSvExIv13W2UQvo6ErULuyMNRQzvQpo0IbnzUIn1zM0o6_7OWE/pub?output=tsv';
       const response = await fetch(sheetURL);
