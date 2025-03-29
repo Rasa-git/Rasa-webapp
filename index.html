@@ -145,15 +145,13 @@
     function showLesson(lesson) {
       const container = document.getElementById("lesson-container");
       container.innerHTML = `
-        <button id="back-button">بازگشت</button>
+        <button onclick="fetchLessons()">بازگشت</button>
         <div class="lesson">
           <div class="lesson-title">${lesson.title}</div>
           <div class="lesson-text">${lesson.text.replace(/\n/g, '<br>')}</div>
           ${lesson.audio ? `<audio class="lesson-audio" controls src="${lesson.audio}"></audio>` : ''}
         </div>
       `;
-
-      document.getElementById("back-button").addEventListener("click", fetchLessons);
     }
 
     fetchLessons();
