@@ -115,30 +115,30 @@
       });
 
       for (const [phase, items] of Object.entries(phases)) {
-        const phaseBox = document.createElement("div");
-        phaseBox.className = "phase";
+  const phaseBox = document.createElement("div");
+  phaseBox.className = "phase";
 
-        const phaseTitle = document.createElement("div");
-        phaseTitle.className = "phase-title";
-        phaseTitle.textContent = phase;
-        phaseTitle.onclick = () => {
-          list.style.display = list.style.display === "none" ? "block" : "none";
-        };
+  const list = document.createElement("div");
+  list.className = "lesson-list";
 
-        const list = document.createElement("div");
-        list.className = "lesson-list";
+  const phaseTitle = document.createElement("div");
+  phaseTitle.className = "phase-title";
+  phaseTitle.textContent = phase;
+  phaseTitle.onclick = () => {
+    list.style.display = list.style.display === "none" ? "block" : "none";
+  };
 
-        items.forEach(lesson => {
-          const item = document.createElement("div");
-          item.className = "lesson-item";
-          item.textContent = lesson.title;
-          item.onclick = () => showLesson(lesson);
-          list.appendChild(item);
-        });
+  items.forEach(lesson => {
+    const item = document.createElement("div");
+    item.className = "lesson-item";
+    item.textContent = lesson.title;
+    item.onclick = () => showLesson(lesson);
+    list.appendChild(item);
+  });
 
-        phaseBox.appendChild(phaseTitle);
-        phaseBox.appendChild(list);
-        container.appendChild(phaseBox);
+  phaseBox.appendChild(phaseTitle);
+  phaseBox.appendChild(list);
+  container.appendChild(phaseBox);
       }
     }
 
