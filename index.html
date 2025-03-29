@@ -1,117 +1,115 @@
-
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <title>اپ رسا</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>رسا - آموزش سیاسی</title>
   <style>
     body {
-      font-family: sans-serif;
-      background: #f4f4f4;
+      font-family: "Vazir", sans-serif;
+      background-color: #f9f9f9;
+      color: #333;
       margin: 0;
       padding: 0;
       direction: rtl;
     }
+
     .header {
-      background: #333;
-      color: white;
+      background-color: #2b2b2b;
+      color: #fff;
       padding: 1rem;
       text-align: center;
+      font-size: 1.4rem;
     }
-    .lesson-list, .lesson-content {
-      max-width: 800px;
-      margin: auto;
+
+    .lesson-container {
       padding: 1rem;
     }
-    .lesson-item {
-      background: white;
+
+    .phase-title {
+      background-color: #ddd;
+      padding: 0.5rem 1rem;
+      margin-top: 2rem;
+      font-weight: bold;
+      border-right: 5px solid #666;
+    }
+
+    .lesson {
+      background-color: white;
+      margin: 1rem 0;
+      padding: 1rem;
+      border-radius: 6px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+
+    .lesson-title {
+      font-weight: bold;
       margin-bottom: 0.5rem;
-      padding: 1rem;
-      cursor: pointer;
-      border-radius: 5px;
-      border: 1px solid #ccc;
     }
-    .lesson-item:hover {
-      background: #eee;
+
+    .lesson-text {
+      margin-bottom: 0.5rem;
+      line-height: 1.7;
     }
-    .back-btn {
-      margin-bottom: 1rem;
-      display: inline-block;
-      color: #007BFF;
-      cursor: pointer;
+
+    .lesson-audio {
+      margin-top: 0.5rem;
     }
-    audio {
-      width: 100%;
-      margin-top: 1rem;
-    }
-  </style>
-</head>
-<body>
 
-  <div class="header">
-    <h1>اپ رسا</h1>
-  </div>
-
-  <div class="lesson-list" id="lessonList">
-    در حال بارگذاری درس‌ها...
-  </div>
-
-  <div class="lesson-content" id="lessonContent" style="display:none;">
-    <div class="back-btn" onclick="goBack()">← بازگشت به لیست درس‌ها</div>
-    <h2 id="lessonTitle"></h2>
-    <p id="lessonText"></p>
-    <audio id="lessonAudio" controls style="display:none;"></audio>
-  </div>
-
-  <script>
-    const sheetUrl = "https://docs.google.com/spreadsheets/d/1-0VtS5cySxSIgVWcF4owEx4CWbGabpRL6L5OlBD1nfU/gviz/tq?tqx=out:json";
-
-    fetch(sheetUrl)
-      .then(res => res.text())
-      .then(data => {
-        const jsonData = JSON.parse(data.substr(47).slice(0, -2));
-        const rows = jsonData.table.rows;
-        const lessons = rows.map(row => {
-          const cells = row.c;
-          return {
-            number: cells[0]?.v || '',
-            title: cells[1]?.v || '',
-            text: cells[2]?.v || '',
-            audio: cells[3]?.v || ''
-          };
-        });
-
-        const lessonList = document.getElementById("lessonList");
-        lessonList.innerHTML = "";
-        lessons.forEach((lesson) => {
-          const item = document.createElement("div");
-          item.className = "lesson-item";
-          item.innerText = lesson.title;
-          item.onclick = () => showLesson(lesson);
-          lessonList.appendChild(item);
-        });
-      });
-
-    function showLesson(lesson) {
-      document.getElementById("lessonList").style.display = "none";
-      document.getElementById("lessonContent").style.display = "block";
-      document.getElementById("lessonTitle").innerText = lesson.title;
-      document.getElementById("lessonText").innerText = lesson.text;
-      const audio = document.getElementById("lessonAudio");
-      if (lesson.audio && lesson.audio.startsWith("http")) {
-        audio.src = lesson.audio;
-        audio.style.display = "block";
-      } else {
-        audio.style.display = "none";
+    @media (max-width: 600px) {
+      .header {
+        font-size: 1.2rem;
+      }
+      .lesson {
+        padding: 0.8rem;
       }
     }
+  </style>
+  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+  <div class="header">اپلیکیشن رسا - آموزش سیاسی</div>
+  <div class="lesson-container" id="lesson-container">در حال بارگذاری درس‌ها...</div>
 
-    function goBack() {
-      document.getElementById("lessonContent").style.display = "none";
-      document.getElementById("lessonList").style.display = "block";
+  <script>
+    async function fetchLessons() {
+      const sheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQqK7c_o8N2rwYwZpXG6GSPgWZDLTuSvExIv13W2UQvo6ErULuyMNRQzvQpo0IbnzUIn1zM0o6_7OWE/pub?output=tsv';
+      const response = await fetch(sheetURL);
+      const tsvText = await response.text();
+
+      const rows = tsvText.trim().split("\n").map(r => r.split("\t"));
+      const headers = rows.shift();
+      const lessons = rows.map(row => {
+        let item = {};
+        headers.forEach((h, i) => item[h] = row[i]);
+        return item;
+      });
+
+      const container = document.getElementById("lesson-container");
+      container.innerHTML = "";
+
+      let currentPhase = "";
+      lessons.forEach(lesson => {
+        if (lesson.Phase && lesson.Phase !== currentPhase) {
+          currentPhase = lesson.Phase;
+          const phaseEl = document.createElement("div");
+          phaseEl.className = "phase-title";
+          phaseEl.textContent = currentPhase;
+          container.appendChild(phaseEl);
+        }
+
+        const lessonEl = document.createElement("div");
+        lessonEl.className = "lesson";
+        lessonEl.innerHTML = `
+          <div class="lesson-title">${lesson.Title}</div>
+          <div class="lesson-text">${lesson.Text}</div>
+          ${lesson.Audio ? `<audio class="lesson-audio" controls src="${lesson.Audio}"></audio>` : ''}
+        `;
+        container.appendChild(lessonEl);
+      });
     }
-  </script>
 
+    fetchLessons();
+  </script>
 </body>
 </html>
