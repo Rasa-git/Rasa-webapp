@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>رسا - آموزش سیاسی</title>
-  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css" rel="stylesheet"/>
   <style>
     body {
       font-family: Vazir, sans-serif;
@@ -13,7 +13,6 @@
       color: #222;
       direction: rtl;
     }
-
     .header {
       background: #333;
       color: #fff;
@@ -21,25 +20,21 @@
       text-align: center;
       font-size: 1.4rem;
     }
-
     .phase {
       background: #ddd;
       margin: 1rem;
       border-radius: 8px;
     }
-
     .phase-title {
       background: #bbb;
       padding: 0.8rem 1rem;
       font-weight: bold;
       cursor: pointer;
     }
-
     .lesson-list {
       display: none;
       padding: 0 1rem 1rem;
     }
-
     .lesson-item {
       background: white;
       margin-top: 0.5rem;
@@ -48,27 +43,22 @@
       box-shadow: 0 0 4px rgba(0,0,0,0.1);
       cursor: pointer;
     }
-
     .lesson {
       padding: 1rem;
     }
-
     .lesson-title {
       font-size: 1.2rem;
       font-weight: bold;
       margin-bottom: 1rem;
     }
-
     .lesson-text {
       line-height: 1.7;
       margin-bottom: 1rem;
       white-space: pre-line;
     }
-
     .lesson-audio {
       margin-top: 1rem;
     }
-
     button {
       background: #666;
       color: white;
@@ -83,8 +73,7 @@
 <body>
   <div class="header">اپلیکیشن رسا - آموزش سیاسی</div>
   <div id="lesson-container">در حال بارگذاری درس‌ها...</div>
-
-  <script>
+    <script>
     async function fetchLessons() {
       const sheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQqK7c_o8N2rwYwZpXG6GSPgWZDLTuSvExIv13W2UQvo6ErULuyMNRQzvQpo0IbnzUIn1zM0o6_7OWE/pub?output=tsv';
       const response = await fetch(sheetURL);
