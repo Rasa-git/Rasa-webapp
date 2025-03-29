@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>رسا - آموزش سیاسی</title>
-  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css" rel="stylesheet" type="text/css" />
   <style>
     body {
       font-family: "Vazir", sans-serif;
@@ -14,6 +13,7 @@
       padding: 0;
       direction: rtl;
     }
+
     .header {
       background-color: #2b2b2b;
       color: #fff;
@@ -21,105 +21,116 @@
       text-align: center;
       font-size: 1.4rem;
     }
-    .phase {
-      margin: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      overflow: hidden;
+
+    .phases-nav {
+      display: flex;
+      flex-wrap: wrap;
+      padding: 0.5rem;
+      gap: 0.5rem;
+      background: #eee;
+      justify-content: center;
     }
-    .phase-title {
-      background-color: #e0e0e0;
-      padding: 1rem;
+
+    .phase-button {
+      background-color: #ccc;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
       cursor: pointer;
+    }
+
+    .phase-button.active {
+      background-color: #666;
+      color: white;
       font-weight: bold;
-      border-right: 5px solid #666;
     }
-    .phase-content {
-      display: none;
+
+    .lesson-container {
       padding: 1rem;
-      background-color: #fff;
     }
+
     .lesson {
-      margin-bottom: 1rem;
-      padding-bottom: 1rem;
-      border-bottom: 1px solid #ddd;
+      background-color: white;
+      margin: 1rem 0;
+      padding: 1rem;
+      border-radius: 6px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
     }
+
     .lesson-title {
       font-weight: bold;
       margin-bottom: 0.5rem;
     }
+
     .lesson-text {
       margin-bottom: 0.5rem;
       line-height: 1.7;
     }
+
     .lesson-audio {
       margin-top: 0.5rem;
     }
+
     @media (max-width: 600px) {
       .header {
         font-size: 1.2rem;
       }
+      .lesson {
+        padding: 0.8rem;
+      }
     }
   </style>
+  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
   <div class="header">اپلیکیشن رسا - آموزش سیاسی</div>
-  <div id="lesson-container">در حال بارگذاری درس‌ها...</div>
+  <div class="phases-nav" id="phases-nav">در حال بارگذاری...</div>
+  <div class="lesson-container" id="lesson-container"></div>
 
   <script>
+    let allLessons = [];
+
     async function fetchLessons() {
-      const sheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQqK7c_o8N2rwYwZpXG6GSPgWZDLTuSvExIv13W2UQvo6ErULuyMNRQzvQpo0IbnzUIn1zM0o6_7OWE/pub?output=tsv';
+      const sheetURL = 'https://opensheet.elk.sh/1-0VtS5cySxSIgVWcF4owEx4CWbGabpRL6L5OlBD1nfU/Tabellenblatt1';
       const response = await fetch(sheetURL);
-      const tsvText = await response.text();
+      const lessons = await response.json();
+      allLessons = lessons;
+      renderPhases(lessons);
+      const firstPhase = [...new Set(lessons.map(l => l.phase))][0];
+      renderLessons(firstPhase);
+    }
 
-      const rows = tsvText.trim().split("\n").map(r => r.split("\t"));
-      const headers = rows.shift();
-      const lessons = rows.map(row => {
-        let item = {};
-        headers.forEach((h, i) => item[h.toLowerCase()] = row[i]);
-        return item;
+    function renderPhases(lessons) {
+      const phases = [...new Set(lessons.map(l => l.phase))];
+      const nav = document.getElementById("phases-nav");
+      nav.innerHTML = "";
+      phases.forEach(phase => {
+        const btn = document.createElement("button");
+        btn.className = "phase-button";
+        btn.textContent = phase;
+        btn.onclick = () => {
+          document.querySelectorAll(".phase-button").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          renderLessons(phase);
+        };
+        nav.appendChild(btn);
       });
+      nav.querySelector(".phase-button")?.classList.add("active");
+    }
 
+    function renderLessons(phase) {
       const container = document.getElementById("lesson-container");
       container.innerHTML = "";
-
-      const phases = {};
-
-      lessons.forEach(lesson => {
-        if (!phases[lesson.phase]) {
-          phases[lesson.phase] = [];
-        }
-        phases[lesson.phase].push(lesson);
-      });
-
-      Object.entries(phases).forEach(([phase, lessons]) => {
-        const phaseEl = document.createElement("div");
-        phaseEl.className = "phase";
-
-        const titleEl = document.createElement("div");
-        titleEl.className = "phase-title";
-        titleEl.textContent = phase;
-        titleEl.addEventListener("click", () => {
-          contentEl.style.display = contentEl.style.display === "none" ? "block" : "none";
-        });
-
-        const contentEl = document.createElement("div");
-        contentEl.className = "phase-content";
-
-        lessons.forEach(lesson => {
-          const lessonEl = document.createElement("div");
-          lessonEl.className = "lesson";
-          lessonEl.innerHTML = `
-            <div class="lesson-title">${lesson.title}</div>
-            <div class="lesson-text">${lesson.text}</div>
-            ${lesson.audio ? `<audio class="lesson-audio" controls src="${lesson.audio}"></audio>` : ''}
-          `;
-          contentEl.appendChild(lessonEl);
-        });
-
-        phaseEl.appendChild(titleEl);
-        phaseEl.appendChild(contentEl);
-        container.appendChild(phaseEl);
+      const filtered = allLessons.filter(l => l.phase === phase);
+      filtered.forEach(lesson => {
+        const el = document.createElement("div");
+        el.className = "lesson";
+        el.innerHTML = `
+          <div class="lesson-title">${lesson.title}</div>
+          <div class="lesson-text">${lesson.text}</div>
+          ${lesson.audio ? `<audio class="lesson-audio" controls src="${lesson.audio}"></audio>` : ''}
+        `;
+        container.appendChild(el);
       });
     }
 
