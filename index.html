@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>رسا - آموزش سیاسی</title>
-  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css" rel="stylesheet">
   <style>
     body {
       font-family: Vazir, sans-serif;
@@ -26,7 +26,6 @@
       background: #ddd;
       margin: 1rem;
       border-radius: 8px;
-      overflow: hidden;
     }
 
     .phase-title {
@@ -79,12 +78,6 @@
       cursor: pointer;
       margin-bottom: 1rem;
     }
-
-    @media (max-width: 600px) {
-      .header {
-        font-size: 1.2rem;
-      }
-    }
   </style>
 </head>
 <body>
@@ -115,43 +108,51 @@
       });
 
       for (const [phase, items] of Object.entries(phases)) {
-  const phaseBox = document.createElement("div");
-  phaseBox.className = "phase";
+        const phaseBox = document.createElement("div");
+        phaseBox.className = "phase";
 
-  const list = document.createElement("div");
-  list.className = "lesson-list";
+        const list = document.createElement("div");
+        list.className = "lesson-list";
 
-  const phaseTitle = document.createElement("div");
-  phaseTitle.className = "phase-title";
-  phaseTitle.textContent = phase;
-  phaseTitle.onclick = () => {
-    list.style.display = list.style.display === "none" ? "block" : "none";
-  };
+        const phaseTitle = document.createElement("div");
+        phaseTitle.className = "phase-title";
+        phaseTitle.textContent = phase;
+        phaseTitle.onclick = () => {
+          list.style.display = list.style.display === "none" ? "block" : "none";
+        };
 
-  items.forEach(lesson => {
-    const item = document.createElement("div");
-    item.className = "lesson-item";
-    item.textContent = lesson.title;
-    item.onclick = () => showLesson(lesson);
-    list.appendChild(item);
-  });
+        items.forEach(lesson => {
+          const item = document.createElement("div");
+          item.className = "lesson-item";
+          item.textContent = lesson.title;
+          item.onclick = () => showLesson(lesson);
+          list.appendChild(item);
+        });
 
-  phaseBox.appendChild(phaseTitle);
-  phaseBox.appendChild(list);
-  container.appendChild(phaseBox);
+        phaseBox.appendChild(phaseTitle);
+        phaseBox.appendChild(list);
+        container.appendChild(phaseBox);
       }
     }
 
     function showLesson(lesson) {
       const container = document.getElementById("lesson-container");
-      container.innerHTML = `
-        <button onclick="fetchLessons()">بازگشت</button>
-        <div class="lesson">
-          <div class="lesson-title">${lesson.title}</div>
-          <div class="lesson-text">${lesson.text.replace(/\n/g, '<br>')}</div>
-          ${lesson.audio ? `<audio class="lesson-audio" controls src="${lesson.audio}"></audio>` : ''}
-        </div>
+      container.innerHTML = "";
+
+      const backBtn = document.createElement("button");
+      backBtn.textContent = "بازگشت";
+      backBtn.onclick = fetchLessons;
+
+      const lessonDiv = document.createElement("div");
+      lessonDiv.className = "lesson";
+      lessonDiv.innerHTML = `
+        <div class="lesson-title">${lesson.title}</div>
+        <div class="lesson-text">${lesson.text.replace(/\n/g, '<br>')}</div>
+        ${lesson.audio ? `<audio class="lesson-audio" controls src="${lesson.audio}"></audio>` : ''}
       `;
+
+      container.appendChild(backBtn);
+      container.appendChild(lessonDiv);
     }
 
     fetchLessons();
